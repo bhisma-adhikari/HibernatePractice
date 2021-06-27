@@ -1,0 +1,3 @@
+- This project illustrates the use of Hibernate ORM for CRUD operations on database. 
+- DDL for the sample database (hibernate_practice) is included as DDL.sql file 
+- This database is designed to contain all possible relationships (OneToOne, ManyToOne, ManyToMany) in order to illustrate the use of Hibernate in each one of these scenarios. 
