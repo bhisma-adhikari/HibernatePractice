@@ -1,3 +1,3 @@
 - This project illustrates the use of Hibernate ORM for CRUD operations on database. 
-- DDL for the sample database (hibernate_practice) is included as DDL.sql file 
-- This database is designed to contain all possible relationships (OneToOne, ManyToOne, ManyToMany) in order to illustrate the use of Hibernate in each one of these scenarios. 
+- DDL for the sample database (hibernate_practice) is included as DDL.sql file. Executing this script will generate the schema only (tables and relationships). This won't populate the tables with any data.  
+- This database is designed to contain all possible relationships (OneToOne, OneToMany, ManyToOne, ManyToMany) in order to illustrate the use of Hibernate in each one of these scenarios. 
