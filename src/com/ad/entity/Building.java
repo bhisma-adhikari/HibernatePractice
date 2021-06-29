@@ -24,7 +24,8 @@ public class Building extends BaseEntity{
 
 	@Override
 	public String toString() {
-		return "Building [id=" + id + ",name=" + name + ", estd=" + estd + ", department=" + department.getName() + "]";
+		String departmentName = this.department != null ? this.department.getName() : "-"; 
+		return "Building [id=" + id + ",name=" + name + ", estd=" + estd + ", department=" + departmentName + "]";
 	}
 
 	public String getName() {

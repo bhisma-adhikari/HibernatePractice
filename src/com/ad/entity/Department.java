@@ -8,25 +8,36 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import java.util.List; 
+import java.util.List;
+import java.util.Set; 
+import java.util.stream.Collectors;
+import java.util.HashSet; 
 
 @Entity
-@Table(name="department")
+@Table(name = "department")
 public class Department extends BaseEntity {
-	
-	@Column(name="name")
+
+	@Column(name = "name")
 	private String name;
-	
-	@OneToMany(mappedBy="department", fetch = FetchType.EAGER)
-	private List<Employee> employees; 
-	
+
+	@OneToMany(mappedBy = "department", fetch = FetchType.EAGER)
+	private Set<Employee> employees = new HashSet<>(); 
+
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "building_id", referencedColumnName = "id")
 	private Building building;
 
 	@Override
 	public String toString() {
-		return "Department [id=" + id + ",name=" + name + ", employees=" + employees + ", building=" + building + "]";
+		List<String> employeeNames = this.employees.stream().map(x -> x.getName()).collect(Collectors.toList());
+		String buildingName = this.building != null ? this.building.getName() : "-"; 
+		return "Department [id=" + id + ",name=" + name + ", employees=" + employeeNames + ", building=" + buildingName + "]";
+	}
+
+	// adds employee (if not already added)
+	public Boolean addEmployee(Employee employee) {
+		employee.setDepartment(this);
+		return this.employees.add(employee);
 	}
 
 	public String getName() {
@@ -37,11 +48,11 @@ public class Department extends BaseEntity {
 		this.name = name;
 	}
 
-	public List<Employee> getEmployees() {
+	public Set<Employee> getEmployees() {
 		return employees;
 	}
 
-	public void setEmployees(List<Employee> employees) {
+	public void setEmployees(Set<Employee> employees) {
 		this.employees = employees;
 	}
 
@@ -51,11 +62,6 @@ public class Department extends BaseEntity {
 
 	public void setBuilding(Building building) {
 		this.building = building;
-	} 
-	
-	
-	
-	
-	
-	
+	}
+
 }

@@ -8,26 +8,26 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 
 import com.ad.entity.BaseEntity;
-import com.ad.entity.Building;
+import com.ad.entity.Employee;
+import com.ad.entity.Project;
 
-public class BuildingService extends BaseService {
+public class ProjectService extends BaseService {
 
-	public BuildingService(SessionFactory sessionFactory) {
+	public ProjectService(SessionFactory sessionFactory) {
 		super(sessionFactory);
 	}
 
-	public Integer insert(Building building) {
+	public Integer insert(Project project) {
 		Session session = this.sessionFactory.getCurrentSession();
 		Integer id = null;
 		try {
 			session.beginTransaction();
-			// save/update referenced objects
-			if (building.getDepartment() != null) {
-				building.getDepartment().setBuilding(building);
-				session.saveOrUpdate(building.getDepartment());
+			// save/update referenced objects 
+			for (Employee e : project.getEmployees()) {
+				e.getProjects().add(project);
+				session.saveOrUpdate(e);
 			}
-			// save building
-			id = (Integer) session.save(building);
+			id = (Integer) session.save(project);
 			session.getTransaction().commit();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -37,72 +37,73 @@ public class BuildingService extends BaseService {
 		return id;
 	}
 
-	public Building get(Integer id) {
+	public Project get(Integer id) {
 		Session session = this.sessionFactory.getCurrentSession();
-		Building building = null;
+		Project project = null;
 		try {
 			session.beginTransaction();
-			building = session.get(Building.class, id);
+			project = session.get(Project.class, id);
 			session.getTransaction().commit();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			session.close();
 		}
-		return building;
+		return project;
 	}
 
-	public List<Building> getAll() {
+	public List<Project> getAll() {
 		Session session = this.sessionFactory.getCurrentSession();
-		List<Building> buildings = null;
+		List<Project> projects = null;
 		try {
 			session.beginTransaction();
-			Criteria criteria = session.createCriteria(Building.class);
-			buildings = criteria.list();
+			Criteria criteria = session.createCriteria(Project.class);
+			projects = criteria.list();
 			session.getTransaction().commit();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			session.close();
 		}
-		return buildings;
+		return projects;
 	}
 
-	public Building getByName(String name) {
+	public Project getByName(String name) {
 		Session session = this.sessionFactory.getCurrentSession();
-		Building building = null;
+		Project project = null;
 		try {
 			session.beginTransaction();
-			Criteria criteria = session.createCriteria(Building.class);
-			building = (Building) criteria.add(Restrictions.eqOrIsNull("name", name)).uniqueResult();
+			Criteria criteria = session.createCriteria(Project.class);
+			project = (Project) criteria.add(Restrictions.eqOrIsNull("name", name)).uniqueResult();
 			session.getTransaction().commit();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			session.close();
 		}
-		return building;
+		return project;
 	}
 
-	public Boolean update(Building building) {
-		Building buildingDb = this.get(building.getId());
-		if (buildingDb == null) {
-			System.out.println("Error updating Building. Invalid building id: " + building.getId());
+	public Boolean update(Project project) {
+		Project projectDb = this.get(project.getId());
+		if (projectDb == null) {
+			System.out.println("Error updating Project. Invalid project id: " + project.getId());
 			return false;
 		}
 		// update fields
-		buildingDb.setDepartment(building.getDepartment());
-		buildingDb.setEstd(building.getEstd());
-		building.setName(building.getName());
+		projectDb.setEmployees(project.getEmployees());
+		projectDb.setName(project.getName());
 
 		Session session = this.sessionFactory.getCurrentSession();
 		try {
 			session.beginTransaction();
-			// update referenced objects
-			buildingDb.getDepartment().setBuilding(buildingDb);
-			session.saveOrUpdate(buildingDb.getDepartment());
-			// update building
-			session.saveOrUpdate(buildingDb);
+			// update referenced objects 
+			for (Employee e : projectDb.getEmployees()) {
+				e.getProjects().add(projectDb); 
+				session.saveOrUpdate(e);
+			}
+			// update project 
+			session.saveOrUpdate(projectDb);
 			session.getTransaction().commit();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -117,12 +118,12 @@ public class BuildingService extends BaseService {
 		Session session = this.sessionFactory.getCurrentSession();
 		try {
 			session.beginTransaction();
-			Building buildingDb = session.get(Building.class, id);
-			if (buildingDb == null) {
-				System.out.println("Error deleting Building. Invalid building id: " + id);
+			Project projectDb = session.get(Project.class, id);
+			if (projectDb == null) {
+				System.out.println("Error deleting Project. Invalid project id: " + id);
 				return false;
 			}
-			session.delete(buildingDb);
+			session.delete(projectDb);
 			session.getTransaction().commit();
 		} catch (Exception e) {
 			e.printStackTrace();

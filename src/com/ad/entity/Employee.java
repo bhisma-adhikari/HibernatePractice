@@ -1,6 +1,7 @@
 package com.ad.entity;
 
 import javax.persistence.Entity;
+
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -10,10 +11,16 @@ import javax.persistence.Table;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet; 
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "employee")
 public class Employee extends BaseEntity {
+	@Column(name = "unique_id")
+	private String uniqueId;
+
 	@Column(name = "name")
 	private String name;
 
@@ -24,20 +31,34 @@ public class Employee extends BaseEntity {
 	private Double salary;
 
 	@ManyToOne
-	@JoinColumn (name = "department_id", nullable=false)
+	@JoinColumn(name = "department_id", nullable = false)
 	private Department department;
 
-	@ManyToMany(cascade = { CascadeType.ALL })
+	@ManyToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
 	@JoinTable(
 			name = "employee_project",
 			joinColumns = { @JoinColumn(name = "employee_id") },
 			inverseJoinColumns = { @JoinColumn(name = "project_id") })
-	private List<Project> projects;
+	private Set<Project> projects = new HashSet<>(); 
 
 	@Override
 	public String toString() {
-		return "Employee [id=" + id + ",name=" + name + ", age=" + age + ", salary=" + salary + ", department=" + department
-				+ ", projects=" + projects + "]";
+		List<String> projectNames = this.projects.stream().map(x -> x.getName()).collect(Collectors.toList()); 
+		String departmentName = this.department != null ? this.department.getName() : "-"; 
+		return "Employee [id=" + id + ",uniqueId=" + uniqueId + ",name=" + name + ", age=" + age + ", salary=" + salary + ", department=" + departmentName + ", projects=" + projectNames + "]";
+	}
+	
+	// adds project (if not already added)
+		public Boolean addProject(Project project) {
+			return this.projects.add(project); 
+		}
+
+	public String getUniqueId() {
+		return uniqueId;
+	}
+
+	public void setUniqueId(String uniqueId) {
+		this.uniqueId = uniqueId;
 	}
 
 	public String getName() {
@@ -72,11 +93,11 @@ public class Employee extends BaseEntity {
 		this.department = department;
 	}
 
-	public List<Project> getProjects() {
+	public Set<Project> getProjects() {
 		return projects;
 	}
 
-	public void setRoles(List<Project> projects) {
+	public void setProjects(Set<Project> projects) {
 		this.projects = projects;
 	}
 
